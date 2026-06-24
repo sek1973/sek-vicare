@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, from, throwError } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 import {
@@ -209,9 +209,9 @@ export class VicareApiService {
     // ─── Auth wiring ───────────────────────────────────────────────────────────
 
     private withAuth<T>(request: () => Observable<T>): Observable<T> {
-        if (this.auth.accessToken) return request();
+        if (this.auth.accessToken) return request().pipe(timeout(15_000));
         return from(this.auth.refreshAccessToken()).pipe(
-            switchMap(() => request()),
+            switchMap(() => request().pipe(timeout(15_000))),
             catchError((err) => {
                 this.auth.logout();
                 return throwError(() => err);

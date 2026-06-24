@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 interface TokenResponse {
@@ -67,17 +68,17 @@ export class AuthService {
             .set('code', code)
             .set('code_verifier', verifier);
 
-        const response = await this.http
-            .post<TokenResponse>(environment.tokenUrl, body.toString(), {
-                headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
-            })
-            .toPromise();
+        const response = await firstValueFrom(
+            this.http
+                .post<TokenResponse>(environment.tokenUrl, body.toString(), {
+                    headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+                })
+                .pipe(timeout(15_000)),
+        );
 
-        if (response) {
-            this.storeTokens(response);
-            sessionStorage.removeItem(KEYS.CODE_VERIFIER);
-            this.isAuthenticated$.next(true);
-        }
+        this.storeTokens(response);
+        sessionStorage.removeItem(KEYS.CODE_VERIFIER);
+        this.isAuthenticated$.next(true);
     }
 
     async refreshAccessToken(): Promise<void> {
@@ -89,15 +90,15 @@ export class AuthService {
             .set('client_id', environment.clientId)
             .set('refresh_token', refreshToken);
 
-        const response = await this.http
-            .post<TokenResponse>(environment.tokenUrl, body.toString(), {
-                headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
-            })
-            .toPromise();
+        const response = await firstValueFrom(
+            this.http
+                .post<TokenResponse>(environment.tokenUrl, body.toString(), {
+                    headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+                })
+                .pipe(timeout(15_000)),
+        );
 
-        if (response) {
-            this.storeTokens(response);
-        }
+        this.storeTokens(response);
     }
 
     logout(): void {
