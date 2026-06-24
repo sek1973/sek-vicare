@@ -1,0 +1,147 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <div class="header-actions">
+            @if (lastRefresh()) {
+            <span class="refresh-time">Updated {{ lastRefresh() | date:'HH:mm:ss' }}</span>
+            }
+            <button mat-icon-button
+                    (click)="load()"
+                    [disabled]="loading()"
+                    aria-label="Refresh">
+                <mat-icon>refresh</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    @if (loading()) {
+    <div class="centered"><mat-spinner diameter="48"></mat-spinner></div>
+    } @else if (error()) {
+    <div class="error-banner">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error() }}</span>
+    </div>
+    } @else if (data(); as d) {
+    <!-- Status chips -->
+    <div class="status-row">
+        <mat-chip-set>
+            <mat-chip [class.chip-on]="d.burnerActive"
+                      [class.chip-off]="!d.burnerActive">
+                <mat-icon matChipAvatar>local_fire_department</mat-icon>
+                Burner {{ d.burnerActive ? 'Active' : 'Standby' }}
+            </mat-chip>
+            @if (d.burnerModulation !== null) {
+            <mat-chip>
+                <mat-icon matChipAvatar>speed</mat-icon>
+                Modulation {{ d.burnerModulation | number:'1.0-0' }} %
+            </mat-chip>
+            }
+            @if (d.burnerHours !== null) {
+            <mat-chip>
+                <mat-icon matChipAvatar>schedule</mat-icon>
+                {{ d.burnerHours | number:'1.0-0' }} h total
+            </mat-chip>
+            }
+        </mat-chip-set>
+    </div>
+
+    <!-- Temperature cards -->
+    <div class="card-grid">
+        @if (d.boilerTemperature !== null) {
+        <mat-card class="stat-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar
+                          class="icon-fire">local_fire_department</mat-icon>
+                <mat-card-title>Boiler</mat-card-title>
+                <mat-card-subtitle>Supply temperature</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <span class="big-value">{{ d.boilerTemperature | number:'1.1-1' }} °C</span>
+            </mat-card-content>
+        </mat-card>
+        }
+
+        @if (d.outsideTemperature !== null) {
+        <mat-card class="stat-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar
+                          class="icon-outside">wb_sunny</mat-icon>
+                <mat-card-title>Outside</mat-card-title>
+                <mat-card-subtitle>Ambient temperature</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <span class="big-value">{{ d.outsideTemperature | number:'1.1-1' }} °C</span>
+            </mat-card-content>
+        </mat-card>
+        }
+
+        @if (d.dhwStorageTemperature !== null) {
+        <mat-card class="stat-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar
+                          class="icon-water">water_drop</mat-icon>
+                <mat-card-title>Hot Water</mat-card-title>
+                <mat-card-subtitle>Storage / target {{ d.dhwTargetTemperature }} °C</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <span class="big-value">{{ d.dhwStorageTemperature | number:'1.1-1' }} °C</span>
+            </mat-card-content>
+        </mat-card>
+        }
+    </div>
+
+    <!-- Circuits -->
+    @for (circuit of d.circuits; track circuit.id) {
+    <mat-card class="section-card">
+        <mat-card-header>
+            <mat-icon mat-card-avatar>device_hub</mat-icon>
+            <mat-card-title>Heating Circuit {{ circuit.id }}</mat-card-title>
+            <mat-card-subtitle>
+                Mode: <strong>{{ circuit.operatingMode ?? '—' }}</strong>
+                &nbsp;·&nbsp; Program: <strong>{{ circuit.activeProgram ?? '—' }}</strong>
+            </mat-card-subtitle>
+        </mat-card-header>
+        @if (circuit.programs.length) {
+        <mat-card-content>
+            <div class="program-list">
+                @for (prog of circuit.programs; track prog.name) {
+                <div class="program-item"
+                     [class.active-program]="prog.isActive">
+                    <span class="prog-name">{{ prog.name }}</span>
+                    @if (prog.temperature !== null) {
+                    <span class="prog-temp">{{ prog.temperature | number:'1.0-1' }} °C</span>
+                    }
+                </div>
+                }
+            </div>
+        </mat-card-content>
+        }
+    </mat-card>
+    }
+
+    <!-- Zones summary -->
+    @if (d.zones.length) {
+    <mat-card class="section-card">
+        <mat-card-header>
+            <mat-icon mat-card-avatar>device_thermostat</mat-icon>
+            <mat-card-title>Zones / Thermostats</mat-card-title>
+            <mat-card-subtitle>{{ d.zones.length }} zone(s) configured</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="zone-grid">
+                @for (zone of d.zones; track zone.id) {
+                <div class="zone-chip"
+                     [class.zone-heating]="zone.valveOpen">
+                    <mat-icon>{{ zone.valveOpen ? 'whatshot' : 'thermostat' }}</mat-icon>
+                    <span class="zone-name">{{ zone.name }}</span>
+                    @if (zone.roomTemperature !== null) {
+                    <span class="zone-temp">{{ zone.roomTemperature | number:'1.1-1' }} °C</span>
+                    }
+                </div>
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+    }
+    }
+</div>

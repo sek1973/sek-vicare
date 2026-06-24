@@ -1,0 +1,81 @@
+.sidenav-container {
+    height: 100vh;
+}
+
+.sidenav {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    background: #1565c0;
+    color: white;
+
+    .sidenav-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 24px 16px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+        .app-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+    }
+
+    .device-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        opacity: 0.8;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    mat-nav-list {
+        flex: 1;
+        padding-top: 8px;
+
+        a[mat-list-item] {
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 4px;
+            margin: 2px 8px;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.12);
+                color: white;
+            }
+
+            &.active-link {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                font-weight: 600;
+            }
+
+            mat-icon {
+                color: inherit;
+            }
+        }
+    }
+
+    .sidenav-footer {
+        padding: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+        button {
+            width: 100%;
+            color: white;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+    }
+}
+
+.main-content {
+    background: #f5f7fa;
+}

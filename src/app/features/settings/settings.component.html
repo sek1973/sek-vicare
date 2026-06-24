@@ -1,0 +1,150 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Settings</h1>
+        <button mat-icon-button
+                (click)="load()"
+                [disabled]="loading()"
+                aria-label="Refresh">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+
+    @if (loading()) {
+    <div class="centered"><mat-spinner diameter="48"></mat-spinner></div>
+    } @else if (error()) {
+    <div class="error-banner"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    } @else if (data(); as d) {
+    <mat-accordion multi>
+
+        <!-- ── Domestic Hot Water ─────────────────────────────────────────── -->
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+                <mat-panel-title><mat-icon>water_drop</mat-icon> Domestic Hot Water</mat-panel-title>
+                <mat-panel-description>Target: {{ d.dhwTargetTemperature ?? '—' }} °C</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="settings-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Target temperature (°C)</mat-label>
+                    <input matInput
+                           type="number"
+                           [(ngModel)]="dhwSettings.targetTemperature"
+                           [min]="d.dhwTargetConstraints?.min ?? 10"
+                           [max]="d.dhwTargetConstraints?.max ?? 60"
+                           [step]="d.dhwTargetConstraints?.step ?? 1" />
+                    @if (d.dhwTargetConstraints) {
+                    <mat-hint>{{ d.dhwTargetConstraints.min }}–{{ d.dhwTargetConstraints.max }} °C</mat-hint>
+                    }
+                </mat-form-field>
+                <button mat-raised-button
+                        color="primary"
+                        [disabled]="saving() === 'dhw-temp'"
+                        (click)="saveDhwTemperature()">
+                    @if (saving() === 'dhw-temp') { <mat-spinner diameter="18"></mat-spinner> }
+                    @else { Save }
+                </button>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- ── Heating Circuits ───────────────────────────────────────────── -->
+        @for (circuit of d.circuits; track circuit.id) {
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <mat-icon>device_hub</mat-icon> Circuit {{ circuit.id }}
+                </mat-panel-title>
+                <mat-panel-description>Mode: {{ circuit.operatingMode ?? '—' }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (circuitSettings[circuit.id]; as cs) {
+            <!-- Operating mode -->
+            <div class="settings-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Operating mode</mat-label>
+                    <mat-select [(ngModel)]="cs.operatingMode">
+                        @for (mode of circuitModes; track mode) {
+                        <mat-option [value]="mode">{{ mode }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <button mat-raised-button
+                        color="primary"
+                        [disabled]="saving() === 'circuit-mode-' + circuit.id"
+                        (click)="saveCircuitMode(circuit.id)">
+                    @if (saving() === 'circuit-mode-' + circuit.id) { <mat-spinner diameter="18"></mat-spinner> }
+                    @else { Apply }
+                </button>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Program temperatures -->
+            <h3 class="section-sub">Program temperatures</h3>
+            <div class="program-grid">
+                @if (getProgram(circuit, 'comfort'); as prog) {
+                <div class="prog-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Comfort (°C)</mat-label>
+                        <input matInput
+                               type="number"
+                               [(ngModel)]="cs.comfortTemperature"
+                               [min]="prog.constraints?.min ?? 10"
+                               [max]="prog.constraints?.max ?? 30"
+                               [step]="prog.constraints?.step ?? 0.5" />
+                    </mat-form-field>
+                    <button mat-flat-button
+                            color="accent"
+                            [disabled]="saving() === circuit.id + '-comfort'"
+                            (click)="saveProgramTemperature(circuit.id, 'comfort', cs.comfortTemperature)">
+                        @if (saving() === circuit.id + '-comfort') { <mat-spinner diameter="18"></mat-spinner> }
+                        @else { Save }
+                    </button>
+                </div>
+                }
+                @if (getProgram(circuit, 'normal'); as prog) {
+                <div class="prog-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Normal (°C)</mat-label>
+                        <input matInput
+                               type="number"
+                               [(ngModel)]="cs.normalTemperature"
+                               [min]="prog.constraints?.min ?? 10"
+                               [max]="prog.constraints?.max ?? 30"
+                               [step]="prog.constraints?.step ?? 0.5" />
+                    </mat-form-field>
+                    <button mat-flat-button
+                            color="accent"
+                            [disabled]="saving() === circuit.id + '-normal'"
+                            (click)="saveProgramTemperature(circuit.id, 'normal', cs.normalTemperature)">
+                        @if (saving() === circuit.id + '-normal') { <mat-spinner diameter="18"></mat-spinner> }
+                        @else { Save }
+                    </button>
+                </div>
+                }
+                @if (getProgram(circuit, 'reduced'); as prog) {
+                <div class="prog-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Reduced (°C)</mat-label>
+                        <input matInput
+                               type="number"
+                               [(ngModel)]="cs.reducedTemperature"
+                               [min]="prog.constraints?.min ?? 5"
+                               [max]="prog.constraints?.max ?? 25"
+                               [step]="prog.constraints?.step ?? 0.5" />
+                    </mat-form-field>
+                    <button mat-flat-button
+                            color="accent"
+                            [disabled]="saving() === circuit.id + '-reduced'"
+                            (click)="saveProgramTemperature(circuit.id, 'reduced', cs.reducedTemperature)">
+                        @if (saving() === circuit.id + '-reduced') { <mat-spinner diameter="18"></mat-spinner> }
+                        @else { Save }
+                    </button>
+                </div>
+                }
+            </div>
+            }
+        </mat-expansion-panel>
+        }
+    </mat-accordion>
+    }
+</div>

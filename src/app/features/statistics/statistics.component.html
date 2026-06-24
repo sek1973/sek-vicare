@@ -1,0 +1,50 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Statistics</h1>
+        <span class="reading-count">{{ readingCount() }} readings stored</span>
+        <button mat-stroked-button
+                color="warn"
+                (click)="clearHistory()">
+            <mat-icon>delete_sweep</mat-icon> Clear history
+        </button>
+    </div>
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Temperature history</mat-card-title>
+            <mat-card-subtitle>
+                Readings collected every {{ 5 }} min while the app is open.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="toolbar">
+                <mat-button-toggle-group [(ngModel)]="selectedRange"
+                                         (change)="onRangeChange()">
+                    <mat-button-toggle value="1h">1 h</mat-button-toggle>
+                    <mat-button-toggle value="6h">6 h</mat-button-toggle>
+                    <mat-button-toggle value="24h">24 h</mat-button-toggle>
+                    <mat-button-toggle value="7d">7 days</mat-button-toggle>
+                </mat-button-toggle-group>
+
+                @if (sensorNames().length) {
+                <div class="sensor-legend">
+                    @for (name of sensorNames(); track name) {
+                    <span class="legend-item">{{ featureLabel(name) }}</span>
+                    }
+                </div>
+                }
+            </div>
+
+            <div class="chart-wrapper">
+                @if (readingCount() === 0) {
+                <div class="no-data">
+                    <mat-icon>show_chart</mat-icon>
+                    <p>No data yet. Keep the app open — readings are collected every 5 minutes.</p>
+                </div>
+                } @else {
+                <canvas #chartCanvas></canvas>
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

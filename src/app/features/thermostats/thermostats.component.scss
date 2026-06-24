@@ -1,0 +1,150 @@
+.page-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+
+    h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 400;
+    }
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    padding: 64px;
+}
+
+.error-banner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #ffebee;
+    border: 1px solid #ef9a9a;
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: #c62828;
+
+    mat-icon {
+        color: #e53935;
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    color: #666;
+
+    mat-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        color: #bbb;
+    }
+
+    .hint {
+        font-size: 0.85rem;
+    }
+}
+
+.zone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.zone-card {
+    .icon-heating {
+        color: #e65100;
+    }
+
+    .icon-idle {
+        color: #1565c0;
+    }
+
+    .temps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 16px 0;
+
+        .temp-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+
+            .temp-label {
+                font-size: 0.75rem;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .temp-value {
+                font-size: 2rem;
+                font-weight: 300;
+            }
+        }
+
+        .arrow {
+            color: #bbb;
+        }
+    }
+
+    .mode-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        background: #f5f5f5;
+        padding: 4px 10px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+
+        mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            color: #666;
+        }
+    }
+
+    .set-temp {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-top: 8px;
+        border-top: 1px solid #f0f0f0;
+
+        .set-label {
+            font-size: 0.85rem;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        mat-slider {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .slider-val {
+            font-weight: 600;
+            min-width: 52px;
+        }
+
+        mat-spinner {
+            margin: 0 auto;
+        }
+    }
+}

@@ -1,0 +1,89 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Thermostats</h1>
+        <button mat-icon-button
+                (click)="load()"
+                [disabled]="loading()"
+                aria-label="Refresh">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+
+    @if (loading()) {
+    <div class="centered"><mat-spinner diameter="48"></mat-spinner></div>
+    } @else if (error()) {
+    <div class="error-banner"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    } @else if (zones().length === 0) {
+    <div class="empty-state">
+        <mat-icon>device_thermostat</mat-icon>
+        <p>No zones detected. Your gateway may use a different feature scheme.</p>
+        <p class="hint">Check that your ViGW gateway firmware is up to date and the zones are configured in the ViCare
+            app.</p>
+    </div>
+    } @else {
+    <div class="zone-grid">
+        @for (zone of zones(); track zone.id) {
+        <mat-card class="zone-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar
+                          [class.icon-heating]="zone.valveOpen"
+                          [class.icon-idle]="zone.valveOpen === false">{{ valveIcon(zone) }}</mat-icon>
+                <mat-card-title>{{ zone.name }}</mat-card-title>
+                <mat-card-subtitle>{{ valveStatusLabel(zone) }}</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="temps">
+                    <div class="temp-block">
+                        <span class="temp-label">Room</span>
+                        <span class="temp-value">
+                            {{ zone.roomTemperature !== null ? (zone.roomTemperature | number:'1.1-1') + ' °C' : '—' }}
+                        </span>
+                    </div>
+                    <mat-icon class="arrow">arrow_forward</mat-icon>
+                    <div class="temp-block">
+                        <span class="temp-label">Target</span>
+                        <span class="temp-value">
+                            {{ zone.targetTemperature !== null ? (zone.targetTemperature | number:'1.1-1') + ' °C' : '—'
+                            }}
+                        </span>
+                    </div>
+                </div>
+
+                @if (zone.activeMode) {
+                <div class="mode-chip">
+                    <mat-icon>settings</mat-icon>
+                    Mode: <strong>{{ zone.activeMode }}</strong>
+                </div>
+                }
+
+                <!-- Set target temperature -->
+                @if (zone.temperatureConstraints) {
+                <div class="set-temp">
+                    <span class="set-label">Set target:</span>
+                    <mat-slider [min]="zone.temperatureConstraints.min"
+                                [max]="zone.temperatureConstraints.max"
+                                [step]="zone.temperatureConstraints.step"
+                                discrete>
+                        <input matSliderThumb
+                               [(ngModel)]="editMap[zone.id].targetTemperature" />
+                    </mat-slider>
+                    <span class="slider-val">{{ editMap[zone.id].targetTemperature }} °C</span>
+                    <button mat-flat-button
+                            color="primary"
+                            [disabled]="savingZone() === zone.id"
+                            (click)="setTargetTemperature(zone)">
+                        @if (savingZone() === zone.id) {
+                        <mat-spinner diameter="18"></mat-spinner>
+                        } @else {
+                        Apply
+                        }
+                    </button>
+                </div>
+                }
+            </mat-card-content>
+        </mat-card>
+        }
+    </div>
+    }
+</div>

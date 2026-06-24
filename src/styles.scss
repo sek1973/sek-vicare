@@ -1,0 +1,45 @@
+@use '@angular/material' as mat;
+
+// ── Material theme ─────────────────────────────────────────────────────────────
+$theme: mat.define-theme((color: (theme-type: light,
+                primary: mat.$azure-palette,
+                tertiary: mat.$orange-palette,
+            ),
+            typography: (brand-family: 'Roboto, sans-serif',
+                plain-family: 'Roboto, sans-serif',
+            ),
+            density: (scale: 0),
+        ));
+
+html {
+    @include mat.all-component-themes($theme);
+}
+
+// ── Global reset ──────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+    background: #f5f7fa;
+    color: #212121;
+}
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 3px;
+}
